@@ -1,51 +1,53 @@
-from datetime import datetime
-from typing import List, Optional
+from decimal import Decimal
+from typing import TypedDict
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field
+
+
+class Webhook(TypedDict):
+    web_hook_url: str
 
 
 class Currency(BaseModel):
-    currencyCodeA: int
-    currencyCodeB: int
+    currency_code_a: int = Field(alias="currencyCodeA")
+    currencyCodeB: int = Field(alias="currencyCodeB")
     date: int
-    rateSell: float = None
-    rateBuy: float = None
-    rateCross: float = None
-
-    def utc_date(self):
-        return datetime.utcfromtimestamp(self.date)
+    rate_sell: Decimal | None = Field(default=None, alias="rateSell")
+    rate_buy: Decimal | None = Field(default=None, alias="rateBuy")
+    rate_cross: Decimal | None = Field(default=None, alias="rateCross")
 
 
 class Account(BaseModel):
     id: str
-    balance: float
-    credit_limit: int
+    send_id: str = Field(alias="sendId")
+    balance: Decimal
+    credit_limit: int = Field(alias="creditLimit")
     type: str
-    currency_code: int
-    cashback_type: str
-    maskedPan: Optional[List[str]] = None
-    iban: Optional[str] = None
+    currency_code: int = Field(alias="currencyCode")
+    cashback_type: str = Field(alias="cashbackType")
+    masked_pan: list[str] | None = Field(default=None, alias="maskedPan")
+    iban: str | None = None
 
-    @validator('balance', 'credit_limit', pre=True, always=True)
-    def convert_to_money(cls, value):
-        return value / 100
 
-    class Config:
-        fields = {
-            'credit_limit': 'creditLimit',
-            'currency_code': 'currencyCode',
-            'cashback_type': 'cashbackType',
-        }
+class Jar(BaseModel):
+    id: str
+    send_id: str = Field(alias="sendId")
+    title: str
+    description: str
+    currency_code: int = Field(alias="currencyCode")
+    balance: Decimal
+    goal: Decimal
 
 
 class ClientInfo(BaseModel):
     id: str
     name: str
     webhook_url: str
-    accounts: List[Account]
+    accounts: list[Account] = Field(default_factory=lambda: list())
+    jars: list[Jar] = Field(default_factory=lambda: list())
 
-    class Config:
-        fields = {'id': 'clientId', 'webhook_url': 'webHookUrl'}
+    # class Config:
+    #     fields = {"id": "clientId", "webhook_url": "webHookUrl"}
 
 
 class StatementItem(BaseModel):
@@ -53,29 +55,17 @@ class StatementItem(BaseModel):
     time: int
     description: str
     mcc: int
+    original_mcc: int = Field(alias="originalMcc")
     hold: bool
-    amount: float
-    operation_amount: int
-    currency_code: int
-    commission_rate: int
-    cashback_amount: int
-    balance: float
-    comment: str = None
-    receipt_id: str = None
-    counter_edrpou: str = None
-    counter_iban: str = None
-
-    @validator('balance', 'amount', 'operation_amount', 'commission_rate', 'cashback_amount', pre=True, always=True)
-    def convert_to_money(cls, value):
-        return value / 100
-
-    class Config:
-        fields = {
-            'operation_amount': 'operationAmount',
-            'currency_code': 'currencyCode',
-            'commission_rate': 'commissionRate',
-            'cashback_amount': 'cashbackAmount',
-            'receipt_id': 'receiptId',
-            'counter_edrpou': 'counterEdrpou',
-            'counter_iban': 'counterIban',
-        }
+    amount: Decimal
+    operation_amount: Decimal = Field(alias="operationAmount")
+    currency_code: int = Field(alias="currencyCode")
+    commission_rate: Decimal = Field(alias="commissionRate")
+    cashback_amount: Decimal = Field(alias="cashbackAmount")
+    balance: Decimal
+    comment: str
+    receipt_id: str = Field(alias="receiptId")
+    invoice_id: str = Field(alias="invoiceId")
+    counter_edrpou: str = Field(alias="counterEdrpou")
+    counter_iban: str = Field(alias="counterIban")
+    counter_name: str = Field(alias="counterName")

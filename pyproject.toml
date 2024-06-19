@@ -2,13 +2,14 @@
 name = "aiomono"
 version = "1.0.3"
 description = "The asynchronous library for monobank API"
-authors = ["Archie <arturboyun@gmail.com>"]
+authors = ["Artur Boyun <arturboyun@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/archiesir/aiomono"
 homepage = "https://github.com/archiesir/aiomono"
 readme = 'README.md'
 keywords = [
     "monobank",
+    "mono",
     "client",
     "api",
     "library",
@@ -17,15 +18,13 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
-aiohttp = "^3.7.4"
-pydantic = "^1.8.2"
+python = "^3.8"
+aiohttp = "^3.9.5"
+pydantic = "^2.7.4"
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
-pytest-asyncio = "^0.15.1"
-pytest-mock = "^3.6.1"
-mypy = "^0.812"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+pytest-asyncio = "^0.23.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
